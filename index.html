@@ -91,14 +91,87 @@
         <div class="row">
             <div id="mapabove" class="col-lg-8 col-lg-offset-2">
             <div id="map"></div>
-            <div class="details" id="mapdetails">
-              Latitude:     <span data-geo="lat" />
-              Longitude:    <span data-geo="lng" />
-              Address:      <span data-geo="formatted_address" />
-              Country Code: <span data-geo="country_short" />
+            <div class="detailsblurb">
+              Latitude:     <span id="latitude">lat</span><br>
+              Longitude:    <span id="longitude">long</span><br>
             </div>
           </div>
         </div>
+
+<!--
+            <form id="formid">
+              <fieldset>
+                <h3>Address-Details</h3>
+
+                <label>Name</label>
+                <input name="name" type="text" value="">
+
+                <label>POI Name</label>
+                <input name="point_of_interest" type="text" value="">
+
+                <label>Latitude</label>
+                <input name="lat" type="text" value="">
+
+                <label>Longitude</label>
+                <input name="lng" type="text" value="">
+
+                <label>Location</label>
+                <input name="location" type="text" value="">
+
+                <label>Location Type</label>
+                <input name="location_type" type="text" value="">
+
+                <label>Formatted Address</label>
+                <input name="formatted_address" type="text" value="">
+
+                <label>Bounds</label>
+                <input name="bounds" type="text" value="">
+
+                <label>Viewport</label>
+                <input name="viewport" type="text" value="">
+
+                <label>Route</label>
+                <input name="route" type="text" value="">
+
+                <label>Street Number</label>
+                <input name="street_number" type="text" value="">
+
+                <label>Postal Code</label>
+                <input name="postal_code" type="text" value="">
+
+                <label>Locality</label>
+                <input name="locality" type="text" value="">
+
+                <label>Sub Locality</label>
+                <input name="sublocality" type="text" value="">
+
+                <label>Country</label>
+                <input name="country" type="text" value="">
+
+                <label>Country Code</label>
+                <input name="country_short" type="text" value="">
+
+                <label>State</label>
+                <input name="administrative_area_level_1" type="text" value="">
+
+                <label>Place ID</label>
+                <input name="place_id" type="text" value="">
+
+                <label>ID</label>
+                <input name="id" type="text" value="">
+
+                <label>Reference</label>
+                <input name="reference" type="text" value="">
+
+                <label>URL</label>
+                <input name="url" type="text" value="">
+
+                <label>Website</label>
+                <input name="website" type="text" value="">
+              </fieldset>
+            </form>
+    -->
+
     </section>
 
     <!-- About Section -->
@@ -154,7 +227,7 @@
     <script  src="//maps.googleapis.com/maps/api/js?key=AIzaSyBig_r1RIzPcFrccXUb5yZL1yir_X8AK4k&sensor=false&amp;libraries=places"></script>
 
     <!-- Plugin geocomplete -->
-    <script src="js/jquery.geocomplete.min.js"></script>
+    <script src="js/jquery.geocomplete.js"></script>
 
 
 

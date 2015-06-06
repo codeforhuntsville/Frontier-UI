@@ -1,24 +1,26 @@
 
 
 $(function(){
-  console.log("Do it");
-
+  $("html,body").animate({scrollTop: 0}, 100); //100ms for example
 
   //geocomplete options
   var geoOptions =      {
         map: "#map",
+        types: ["geocode", "establishment"],
         mapOptions: {
           zoom: 10
         },
         markerOptions: {
           draggable: true
-        },
-        details: "#mapdetails"
-      };
+        }
+    };
 
   $("#geocomplete").geocomplete(geoOptions)
     .bind("geocode:result", function(event, result){
       console.log("Result: " + result.formatted_address);
+      console.log(result.geometry.location);
+      $("#latitude").text(result.geometry.location.A);
+      $("#longitude").text(result.geometry.location.F);
       $('html, body').animate({
           scrollTop: $("#mapabove").offset().top
       }, 2000);
