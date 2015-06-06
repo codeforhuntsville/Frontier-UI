@@ -1,49 +1,119 @@
+"use strict";
 
+var map;
+var infowindow;
+
+
+function createMarker(place) {
+  var placeLoc = place.geometry.location;
+  console.log("Dropping", place.name, place);
+  var marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location
+  });
+
+  google.maps.event.addListener(marker, 'click', function() {
+    //console.log("Showing", place.name);
+    infowindow.setContent("<div style='color:black;'>" + place.name + "</div>");
+    infowindow.open(map, this);
+  });
+}
+
+function searchCallback(results, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      createMarker(results[i]);
+      //console.log(results[i]);
+    }
+  }
+}
+
+
+
+function loadMap(lat, lng) {
+
+    var latlong = new google.maps.LatLng(lat, lng);
+
+
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: latlong,
+      zoom: 13
+    });
+
+
+    $("#latitude").text(lat);
+    $("#longitude").text(lng);
+
+
+
+    var request = {
+      location: latlong,
+      radius: 1500,
+      types: ['restaurant']
+    };
+    infowindow = new google.maps.InfoWindow();
+    var service = new google.maps.places.PlacesService(map);
+    service.nearbySearch(request, searchCallback);
+
+
+
+
+
+
+/*
+
+  var location = lat + ',' + lng;
+
+  var requestOptions = {
+    url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+    qs: {
+      key: googleApiKey,
+      location: location,
+      radius: 1600,
+      type: 'restaurant'
+    },
+    json: true
+  };
+*/
+
+
+
+}
+
+
+var autocomplete = new google.maps.places.Autocomplete($("#frontiersearch")[0], {});
+
+          google.maps.event.addListener(autocomplete, 'place_changed', function() {
+              var place = autocomplete.getPlace();
+              var lat = place.geometry.location.A;
+              var lng = place.geometry.location.F;
+
+              loadMap(lat, lng);
+              $('html, body').animate({
+                  scrollTop: $("#mapabove").offset().top
+              }, 2000);
+
+        });
+
+
+
+function showPosition(position) {
+
+  loadMap(position.coords.latitude, position.coords.longitude);
+  $('html, body').animate({
+      scrollTop: $("#mapabove").offset().top
+  }, 2000);
+
+}
 
 $(function(){
   $("html,body").animate({scrollTop: 0}, 100); //100ms for example
 
-  //geocomplete options
-  var geoOptions =      {
-        map: "#map",
-        types: ["geocode", "establishment"],
-        mapOptions: {
-          zoom: 10
-        },
-        markerOptions: {
-          draggable: true
-        }
-    };
-
-  $("#geocomplete").geocomplete(geoOptions)
-    .bind("geocode:result", function(event, result){
-      console.log("Result: " + result.formatted_address);
-      console.log(result.geometry.location);
-      $("#latitude").text(result.geometry.location.A);
-      $("#longitude").text(result.geometry.location.F);
-      $('html, body').animate({
-          scrollTop: $("#mapabove").offset().top
-      }, 2000);
-
-    })
-    .bind("geocode:error", function(event, status){
-      console.log("ERROR: " + status);
-    })
-    .bind("geocode:multiple", function(event, results){
-      console.log("Multiple: " + results.length + " results found");
-    });
-
-
-  $("#gobutton").click(function(){
-    var geo = $("#geocomplete").val();
-    console.log("Map it", location);
-});
-
-
-  $("#examples a").click(function(){
-    $("#geocomplete").val($(this).text()).trigger("geocode");
-    return false;
-  });
+    if (navigator.geolocation) {
+         navigator.geolocation.getCurrentPosition(showPosition);
+     } else {
+         x.innerHTML = "Geolocation is not supported by this browser.";
+     }
 
 });
 
