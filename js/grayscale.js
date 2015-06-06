@@ -2,11 +2,27 @@
 
 var map;
 var infowindow;
+var latlong;
+var autocomplete;
+
+
+function compareLatLng(a,b) {
+  if (a.latlongdistance < b.latlongdistance)
+    return -1;
+  if (a.latlongdistance > b.latlongdistance)
+    return 1;
+  return 0;
+}
+
 
 
 function createMarker(place) {
-  var placeLoc = place.geometry.location;
   console.log("Dropping", place.name, place);
+
+  //<tr><th></th><th>Name</th><th>Address</th><th>Distance</th></tr>
+  place.latlongdistance = google.maps.geometry.spherical.computeDistanceBetween(place.geometry.location, latlong) / 1609;
+  place.latlongdistance =  Math.round(place.latlongdistance * 100) / 100;
+
   var marker = new google.maps.Marker({
     map: map,
     position: place.geometry.location
@@ -14,17 +30,35 @@ function createMarker(place) {
 
   google.maps.event.addListener(marker, 'click', function() {
     //console.log("Showing", place.name);
-    infowindow.setContent("<div style='color:black;'>" + place.name + "</div>");
+    infowindow.setContent("<div style='color:black;'>" + place.name + "&nbsp;</div>");
     infowindow.open(map, this);
   });
 }
 
 function searchCallback(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
+    $(".map_row").remove();
+
     for (var i = 0; i < results.length; i++) {
       createMarker(results[i]);
       //console.log(results[i]);
     }
+
+    results.sort(compareLatLng);
+
+    for (var i = 0; i < results.length; i++) {
+      var place = results[i];      
+      $("#resultList").append('<tr class="map_row">'+
+        '<td><img width="16px" src="'+place.icon+'"></td>'+
+        '<td>'+place.name+'</td>'+
+        '<td>'+place.vicinity+'</td>'+
+        '<td>'+place.latlongdistance+'</td>'+
+
+        '</tr>');
+
+    }
+
+
   }
 }
 
@@ -32,7 +66,7 @@ function searchCallback(results, status) {
 
 function loadMap(lat, lng) {
 
-    var latlong = new google.maps.LatLng(lat, lng);
+    latlong = new google.maps.LatLng(lat, lng);
 
 
     map = new google.maps.Map(document.getElementById('map'), {
@@ -80,40 +114,62 @@ function loadMap(lat, lng) {
 
 }
 
+function initAutoComplete() {
 
-var autocomplete = new google.maps.places.Autocomplete($("#frontiersearch")[0], {});
+  autocomplete = new google.maps.places.Autocomplete($("#frontiersearch")[0], {});
 
-          google.maps.event.addListener(autocomplete, 'place_changed', function() {
-              var place = autocomplete.getPlace();
-              var lat = place.geometry.location.A;
-              var lng = place.geometry.location.F;
+      google.maps.event.addListener(autocomplete, 'place_changed', function() {
+          var place = autocomplete.getPlace();
+          var lat = place.geometry.location.lat();
+          var lng = place.geometry.location.lng();
 
-              loadMap(lat, lng);
-              $('html, body').animate({
-                  scrollTop: $("#mapabove").offset().top
-              }, 2000);
+          loadMap(lat, lng);
+          scrollToMap();
 
-        });
+  });
+
+
+}
+
+
+initAutoComplete() ;
+
+function scrollToMap() {
+  $('html, body').animate({
+      scrollTop: $("#resultList").offset().top - 45
+  }, 2000);
+
+}
 
 
 
 function showPosition(position) {
 
   loadMap(position.coords.latitude, position.coords.longitude);
-  $('html, body').animate({
-      scrollTop: $("#mapabove").offset().top
-  }, 2000);
+  console.log("scroll to", $("#mapsection").offset().top);
+
+  scrollToMap();
 
 }
 
+//ready()
 $(function(){
-  $("html,body").animate({scrollTop: 0}, 100); //100ms for example
+    $("html,body").animate({scrollTop: 0}, 100); //100ms for example
 
     if (navigator.geolocation) {
          navigator.geolocation.getCurrentPosition(showPosition);
      } else {
          x.innerHTML = "Geolocation is not supported by this browser.";
      }
+
+     $('#clearbutton').click(function() {
+       console.log("clear");
+       autocomplete.clear();
+       $("#frontiersearch").focus();
+
+     });
+
+
 
 });
 

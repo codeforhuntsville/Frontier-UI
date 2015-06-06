@@ -71,9 +71,19 @@
         <div class="intro-body">
             <div class="container">
                 <div class="row">
+
                     <div class="col-md-8 col-md-offset-2">
                         <h1 class="brand-heading">Frontier</h1>
                         <input autofocus autocomplete="off" id="frontiersearch" type="search" class="form-control" placeholder="Address...">
+
+                        <!--
+                        <div class="input-group">
+                        <input autofocus autocomplete="off" id="frontiersearch" type="search" class="form-control" placeholder="Address...">
+                        <span class="input-group-btn">
+                          <button id="clearbutton" class="btn btn-default" type="button">Clear</button>
+                        </span>
+                      </div>
+                    -->
                     </div>
                 </div>
             </div>
@@ -81,15 +91,28 @@
     </header>
 
     <!-- Map Section -->
+
     <section id="mapsection" class="container content-section text-center">
         <div class="row">
-            <div id="mapabove" class="col-lg-8 col-lg-offset-2">
-            <div id="map"></div>
-            <div class="detailsblurb">
-              Latitude:     <span id="latitude">lat</span><br>
-              Longitude:    <span id="longitude">long</span><br>
-            </div>
+          <div class="col-md-8 col-md-offset-2">
+            <table id="resultList" class="table table-striped" width="100%">
+              <thead>
+                <tr><th></th><th>Name</th><th>Address</th><th>Distance</th></tr>
+              </thead>
+
+
+            </table>
           </div>
+        </div>
+
+        <div class="row">
+            <div id="mapabove" class="col-lg-8 col-lg-offset-2">
+              <div id="map"></div>
+              <div class="detailsblurb hidden">
+                Latitude:     <span id="latitude">lat</span><br>
+                Longitude:    <span id="longitude">long</span><br>
+              </div>
+            </div>
         </div>
 
 <!--
@@ -218,7 +241,7 @@
     <script src="js/jquery.easing.min.js"></script>
 
     <!-- Google Maps API Key and libraries API -->
-    <script  src="//maps.googleapis.com/maps/api/js?key=AIzaSyBig_r1RIzPcFrccXUb5yZL1yir_X8AK4k&sensor=false&amp;libraries=places"></script>
+    <script  src="//maps.googleapis.com/maps/api/js?key=AIzaSyBig_r1RIzPcFrccXUb5yZL1yir_X8AK4k&amp;sensor=false&amp;libraries=geometry,places"></script>
 
 
     <!-- Custom Theme JavaScript -->
