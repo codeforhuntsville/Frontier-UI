@@ -160,7 +160,7 @@ function searchCallback(results, status) {
           console.log("Trigger click!", markers[i]['metaID']);
           google.maps.event.trigger(markers[i], 'click');
           $('html, body').animate({
-            scrollTop: $("#mapabove").offset().top - 15
+            scrollTop: $("#mapabove").offset().top - 35
           }, 2000);
 
           break;
