@@ -159,6 +159,10 @@ function searchCallback(results, status) {
           if(markers[i]['metaID'] == datametaID) {
                 console.log("Trigger click!", markers[i]['metaID']);
                 google.maps.event.trigger(markers[i], 'click');
+                $('html, body').animate({
+                    scrollTop: $("#mapabove").offset().top - 15
+                }, 2000);
+
               break;
           }
         }
