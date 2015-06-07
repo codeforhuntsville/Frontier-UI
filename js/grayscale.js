@@ -53,6 +53,20 @@ function searchCallback(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     $(".map_row").remove();
 
+
+      var marker = new google.maps.Marker({
+        map: map,
+        position: latlong,
+        icon: 'img/blue_markerA.png'
+      });
+
+      google.maps.event.addListener(marker, 'click', function() {
+        //console.log("Showing", place.name);
+        infowindow.setContent("<div style='color:black;'>You&nbsp;</div>");
+        infowindow.open(map, this);
+      });
+
+
     for (var i = 0; i < results.length; i++) {
 
       results[i].latlongdistance = google.maps.geometry.spherical.computeDistanceBetween(results[i].geometry.location, latlong) / 1609;
