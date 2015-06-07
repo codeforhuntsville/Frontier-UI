@@ -190,7 +190,7 @@ function loadMap(lat, lng) {
 
     var request = {
       location: latlong,
-      radius: 1500,
+      radius: 3500,
       types: searchTypes
     };
     infowindow = new google.maps.InfoWindow();
