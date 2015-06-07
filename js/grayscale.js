@@ -4,6 +4,8 @@ var map;
 var infowindow;
 var latlong;
 var autocomplete;
+var searchTypes = [];
+
 
 
 function compareLatLng(a,b) {
@@ -47,7 +49,7 @@ function searchCallback(results, status) {
     results.sort(compareLatLng);
 
     for (var i = 0; i < results.length; i++) {
-      var place = results[i];      
+      var place = results[i];
       $("#resultList").append('<tr class="map_row">'+
         '<td><img width="16px" src="'+place.icon+'"></td>'+
         '<td>'+place.name+'</td>'+
@@ -78,12 +80,12 @@ function loadMap(lat, lng) {
     $("#latitude").text(lat);
     $("#longitude").text(lng);
 
-
+    gatherSearchToggles();
 
     var request = {
       location: latlong,
       radius: 1500,
-      types: ['restaurant']
+      types: searchTypes
     };
     infowindow = new google.maps.InfoWindow();
     var service = new google.maps.places.PlacesService(map);
@@ -136,7 +138,7 @@ initAutoComplete() ;
 
 function scrollToMap() {
   $('html, body').animate({
-      scrollTop: $("#resultList").offset().top - 45
+      scrollTop: $("#searchtoggles").offset().top - 55
   }, 2000);
 
 }
@@ -152,9 +154,43 @@ function showPosition(position) {
 
 }
 
+
+function gatherSearchToggles() {
+
+  searchTypes = [];
+
+    $( ".searchtoggle").each(function( index ) {
+        var searchType = $(this).val();
+        if($(this).is(':checked')) {
+            searchTypes.push(searchType);
+            console.log(searchType, "Checked");
+        } else {
+          console.log(searchType, "NOT Checked");
+        }
+    });
+
+    if(searchTypes.length == 0) {
+      $( "#allwarning").show();
+    } else {
+      $( "#allwarning").hide();
+    }
+
+    console.log(searchTypes);
+
+}
+
 //ready()
 $(function(){
+
+  //gather toggles
+
     $("html,body").animate({scrollTop: 0}, 100); //100ms for example
+
+    $('.searchtoggle').click(function() {
+      gatherSearchToggles();
+      loadMap(latlong.lat(), latlong.lng());
+    });
+
 
     if (navigator.geolocation) {
          navigator.geolocation.getCurrentPosition(showPosition);
@@ -162,12 +198,6 @@ $(function(){
          x.innerHTML = "Geolocation is not supported by this browser.";
      }
 
-     $('#clearbutton').click(function() {
-       console.log("clear");
-       autocomplete.clear();
-       $("#frontiersearch").focus();
-
-     });
 
 
 
