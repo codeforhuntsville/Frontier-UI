@@ -195,12 +195,21 @@ function loadMap(lat, lng) {
 
   gatherSearchToggles();
 
+
   var request = {
     location: latlong,
     types: searchTypes,
-    rankBy: google.maps.places.RankBy.DISTANCE
+    rankBy: google.maps.places.RankBy.DISTANCE,
 
   };
+
+//    openNow: true
+
+  if(searchTypes.indexOf("opennow") > -1) {
+    request['openNow'] = true;
+  }
+  console.log("requesting...", request);
+
   infowindow = new google.maps.InfoWindow();
   var service = new google.maps.places.PlacesService(map);
   service.nearbySearch(request, searchCallback);
