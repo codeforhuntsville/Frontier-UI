@@ -17,13 +17,25 @@ function compareLatLng(a,b) {
 }
 
 
+function isOpen(place) {
+
+  if (typeof(place) != 'undefined' && place != null) {
+    if (typeof(place.opening_hours) != 'undefined' && place.opening_hours != null) {
+      if (typeof(place.opening_hours.open_now) != 'undefined' && place.opening_hours.open_now != null) {
+        return (place.opening_hours.open_now == true || place.opening_hours.open_now == "true");
+      }
+    }
+  }
+
+  return false;
+
+}
+
 
 function createMarker(place) {
   console.log("Dropping", place.name, place);
 
   //<tr><th></th><th>Name</th><th>Address</th><th>Distance</th></tr>
-  place.latlongdistance = google.maps.geometry.spherical.computeDistanceBetween(place.geometry.location, latlong) / 1609;
-  place.latlongdistance =  Math.round(place.latlongdistance * 100) / 100;
 
   var marker = new google.maps.Marker({
     map: map,
@@ -42,7 +54,13 @@ function searchCallback(results, status) {
     $(".map_row").remove();
 
     for (var i = 0; i < results.length; i++) {
-      createMarker(results[i]);
+
+      results[i].latlongdistance = google.maps.geometry.spherical.computeDistanceBetween(results[i].geometry.location, latlong) / 1609;
+      results[i].latlongdistance =  Math.round(results[i].latlongdistance * 100) / 100;
+
+      if(isOpen(results[i])) {
+        createMarker(results[i]);
+      }
       //console.log(results[i]);
     }
 
@@ -50,10 +68,14 @@ function searchCallback(results, status) {
 
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
-      $("#resultList").append('<tr class="map_row">'+
+      var closed = "open_now";
+      if(!isOpen(results[i])) {
+          closed = "closed_now";
+      }
+      $("#resultList").append('<tr class="map_row '+closed+'">'+
         '<td><img width="16px" src="'+place.icon+'"></td>'+
         '<td>'+place.name+'</td>'+
-        '<td>'+place.vicinity+'</td>'+
+        '<td>'+place.vicinity +'</td>'+
         '<td>'+place.latlongdistance+'</td>'+
 
         '</tr>');
