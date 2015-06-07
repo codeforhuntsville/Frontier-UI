@@ -5,7 +5,13 @@ var infowindow;
 var latlong;
 var autocomplete;
 var searchTypes = [];
+var markers = [];
 
+var counterUnique = new Date().getTime();; //for unique IDs
+var uniqueId = function(){
+    var newID = 'myid-' + counterUnique++;
+    return newID;
+}
 
 
 function compareLatLng(a,b) {
@@ -32,8 +38,7 @@ function isOpen(place) {
 }
 
 
-function createMarker(place) {
-  console.log("Dropping", place.name, place);
+function createMarker(place, metaID) {
 
   //<tr><th></th><th>Name</th><th>Address</th><th>Distance</th></tr>
 
@@ -42,16 +47,44 @@ function createMarker(place) {
     position: place.geometry.location
   });
 
+  marker.metaID = metaID;
+
+
+  console.log("Dropping", place.name, marker);
+
   google.maps.event.addListener(marker, 'click', function() {
     //console.log("Showing", place.name);
-    infowindow.setContent("<div style='color:black;'>" + place.name + "&nbsp;</div>");
+    //
+//With a set location as starting point (Automatically generates directions with no user input required).
+//https://www.google.com/maps?saddr=760+West+Genesee+Street+Syracuse+NY+13204&daddr=314+Avery+Avenue+Syracuse+NY+13204
+//https://www.google.com/maps?saddr=My+Location&daddr=43.12345,-76.12345
+
+    var directions = genDirLink(place);
+    var directionsLink = "<a style='color:darkgreen;' href='" + directions + "'>Directions</a>&nbsp;<img src='img/extlink.png'>";
+
+    infowindow.setContent("<div style='color:black;'>" + place.name + "<br>"+directionsLink+"&nbsp;</div>");
     infowindow.open(map, this);
   });
+
+  markers.push(marker);
+
+}
+
+function genDirLink(place) {
+
+  var directions = "https://www.google.com/maps?saddr="+latlong.lat()+","+latlong.lng()+"";
+  directions = directions + "&daddr="+ encodeURIComponent(place.name) +","+encodeURIComponent(place.vicinity);
+
+  return directions;
+
 }
 
 function searchCallback(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
-    $(".map_row").remove();
+
+
+
+      deleteMarkers();
 
 
       var marker = new google.maps.Marker({
@@ -69,11 +102,14 @@ function searchCallback(results, status) {
 
     for (var i = 0; i < results.length; i++) {
 
+      var metaID = uniqueId();
       results[i].latlongdistance = google.maps.geometry.spherical.computeDistanceBetween(results[i].geometry.location, latlong) / 1609;
       results[i].latlongdistance =  Math.round(results[i].latlongdistance * 100) / 100;
+      results[i].metaID = metaID;
+
 
       if(isOpen(results[i])) {
-        createMarker(results[i]);
+        createMarker(results[i], metaID);
       }
       //console.log(results[i]);
     }
@@ -86,15 +122,49 @@ function searchCallback(results, status) {
       if(!isOpen(results[i])) {
           closed = "closed_now";
       }
-      $("#resultList").append('<tr class="map_row '+closed+'">'+
-        '<td><img width="16px" src="'+place.icon+'"></td>'+
-        '<td>'+place.name+'</td>'+
-        '<td>'+place.vicinity +'</td>'+
+
+      var tableRow = '<tr class="map_row '+closed+'">'+
+        '<td><img width="16px" src="'+place.icon+'"></td>';
+
+        if(isOpen(results[i])) {
+          tableRow = tableRow +
+          '<td><a data-metaID="'+place.metaID+'" class="placeNameLink" href="#'+place.metaID+'">'+place.name+'</a></td>';
+
+        } else {
+          tableRow = tableRow + '<td>'+place.name+'</td>';
+
+        }
+
+        var directions = genDirLink(place);
+        var directionsLink = "<a class='"+closed+"' href='" + directions + "'>"+place.vicinity+"</a>&nbsp;<img src='img/extlink.png'>";
+        tableRow = tableRow + '<td>'+directionsLink +'</td>';
+
+        tableRow = tableRow +
         '<td>'+place.latlongdistance+'</td>'+
 
-        '</tr>');
+        '</tr>';
+
+      $("#resultList").append(tableRow);
 
     }
+
+
+      //rebind click listeners
+      $('.placeNameLink').click(function() {
+        var datametaID = $(this).attr("data-metaID");
+        console.log("Need to open", datametaID);
+        for(var i = 0 ; i < markers.length; i++) {
+          console.log("Does", markers[i]['metaID'], "=", datametaID);
+          if(markers[i]['metaID'] == datametaID) {
+                console.log("Trigger click!", markers[i]['metaID']);
+                google.maps.event.trigger(markers[i], 'click');
+              break;
+          }
+        }
+        return false;
+      });
+
+
 
 
   }
@@ -180,9 +250,23 @@ function scrollToMap() {
 }
 
 
+function deleteMarkers() {
+  $('.placeNameLink').unbind( "click" );
+  $(".map_row").remove();
+  if(map != undefined) {
+    google.maps.event.clearListeners(map, 'bounds_changed');
+  }
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(null);
+  }
+  markers = [];
+}
+
 
 function showPosition(position) {
 
+
+  deleteMarkers();
   loadMap(position.coords.latitude, position.coords.longitude);
   console.log("scroll to", $("#mapsection").offset().top);
 
@@ -217,6 +301,7 @@ function gatherSearchToggles() {
 
 //ready()
 $(function(){
+
 
   //gather toggles
 
