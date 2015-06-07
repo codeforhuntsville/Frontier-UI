@@ -28,12 +28,17 @@ function isOpen(place) {
   if (typeof(place) != 'undefined' && place != null) {
     if (typeof(place.opening_hours) != 'undefined' && place.opening_hours != null) {
       if (typeof(place.opening_hours.open_now) != 'undefined' && place.opening_hours.open_now != null) {
-        return (place.opening_hours.open_now == true || place.opening_hours.open_now == "true");
+        if(place.opening_hours.open_now == true || place.opening_hours.open_now == "true") {
+          return 1;
+        } else {
+          return 0;
+        }
       }
     }
   }
 
-  return false;
+  //assume open if not known
+  return 2;
 
 }
 
@@ -108,7 +113,7 @@ function searchCallback(results, status) {
       results[i].metaID = metaID;
 
 
-      if(isOpen(results[i])) {
+      if(isOpen(results[i]) > 0) {
         createMarker(results[i], metaID);
       }
       //console.log(results[i]);
@@ -118,17 +123,13 @@ function searchCallback(results, status) {
 
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
-      var closed = "open_now";
-      if(!isOpen(results[i])) {
-          closed = "closed_now";
-      }
-
+      var closed = "open" + isOpen(results[i]);
       var tableRow = '<tr class="map_row '+closed+'">'+
         '<td><img width="16px" src="'+place.icon+'"></td>';
 
-        if(isOpen(results[i])) {
+        if(isOpen(results[i]) > 0) {
           tableRow = tableRow +
-          '<td><a data-metaID="'+place.metaID+'" class="placeNameLink" href="#'+place.metaID+'">'+place.name+'</a></td>';
+          '<td><a data-metaID="'+place.metaID+'" class="placeNameLink '+closed+' " href="#'+place.metaID+'">'+place.name+'</a></td>';
 
         } else {
           tableRow = tableRow + '<td>'+place.name+'</td>';
@@ -174,6 +175,8 @@ function searchCallback(results, status) {
 
 function loadMap(lat, lng) {
 
+
+    deleteMarkers();
     latlong = new google.maps.LatLng(lat, lng);
 
 
@@ -190,8 +193,9 @@ function loadMap(lat, lng) {
 
     var request = {
       location: latlong,
-      radius: 3500,
-      types: searchTypes
+      types: searchTypes,
+      rankBy: google.maps.places.RankBy.DISTANCE
+
     };
     infowindow = new google.maps.InfoWindow();
     var service = new google.maps.places.PlacesService(map);
@@ -321,8 +325,8 @@ $(function(){
     $("html,body").animate({scrollTop: 0}, 100); //100ms for example
 
     $('.searchtoggle').click(function() {
-      gatherSearchToggles();
-      loadMap(latlong.lat(), latlong.lng());
+
+            loadMap(latlong.lat(), latlong.lng());
     });
 
 
