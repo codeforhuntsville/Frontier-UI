@@ -224,7 +224,20 @@ function loadMap(lat, lng) {
 
 function initAutoComplete() {
 
-  autocomplete = new google.maps.places.Autocomplete($("#frontiersearch")[0], {});
+
+  var defaultBounds = new google.maps.LatLngBounds(
+      //Neel, AL
+    new google.maps.LatLng(34.4657, -87.05931),
+      //Hazel Green, AL
+    new google.maps.LatLng(34.93231, -86.57194)
+  );
+
+  var autoCompleteOptions = {
+      bounds:defaultBounds,
+      componentRestrictions: {country: 'us'}
+  };
+
+  autocomplete = new google.maps.places.Autocomplete($("#frontiersearch")[0],autoCompleteOptions);
 
       google.maps.event.addListener(autocomplete, 'place_changed', function() {
           var place = autocomplete.getPlace();
