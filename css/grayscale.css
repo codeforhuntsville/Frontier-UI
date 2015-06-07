@@ -6,15 +6,15 @@
   text-align: left;
 }
 .placeNameLink {
-  color: GreenYellow ;
+  color: #28C940 ;
   text-decoration: underline;
 }
 .open_now {
-  color: GreenYellow ;
+  color: #28C940 ;
 }
 .closed_now {
   text-decoration: line-through;
-  color: darkred;
+  color: #D98683;
 }
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
